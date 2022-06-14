@@ -1,0 +1,32 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "WeatherServer.Contracts";
+
+import "google/protobuf/timestamp.proto";
+
+service AmbientDataMonitor {
+  rpc GetDataForSensor (AmbientDataRequest) returns (stream AmbientData);
+  rpc SubscribeForSensorData (stream SensorSubscriptionRequest) returns (stream AmbientData);
+}
+
+message SensorSubscriptionRequest {
+  int32 sensorId = 1;  
+  bool unsubscribe = 2;
+}
+
+message AmbientDataRequest {
+  int32 sensorId = 1;
+}
+
+message AmbientData {
+  int32 sensorId = 1;
+  float temperature = 2;
+  float humidity = 3;
+  int32 co2 = 4;
+  google.protobuf.Timestamp createdAt = 5;
+  enum SensorType {
+    OUTDOOR = 0;
+    INDOOR = 1;
+  }
+  SensorType sensorType = 6;
+}
