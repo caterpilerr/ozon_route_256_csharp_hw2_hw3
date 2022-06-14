@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +26,7 @@ namespace WeatherClient
             services.AddSingleton<IAggregatedAmbientDataStore, AggregatedAmbientDataStore>();
             services.AddSingleton<IAmbientDataStreamService, AmbientDataStreamService>();
             services.AddHostedService(x => (AmbientDataStreamService)x.GetService<IAmbientDataStreamService>());
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherClient", Version = "v1" });

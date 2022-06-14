@@ -24,4 +24,9 @@ message AmbientData {
   float humidity = 3;
   int32 co2 = 4;
   google.protobuf.Timestamp createdAt = 5;
+  enum SensorType {
+    OUTDOOR = 0;
+    INDOOR = 1;
+  }
+  SensorType sensorType = 6;
 }

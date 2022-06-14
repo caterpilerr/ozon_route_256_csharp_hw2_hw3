@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WeatherClient.Entities;
 using WeatherClient.Interfaces;
 using WeatherServer.Contracts;
 using static System.Threading.Tasks.Task;
@@ -51,6 +53,7 @@ namespace WeatherClient.Services
                         var model = new AmbientData
                         {
                             SensorId = data.SensorId,
+                            SensorType = Enum.Parse<SensorType>(data.SensorType.ToString()),
                             Temperature = data.Temperature,
                             Humidity = data.Humidity,
                             Co2 = data.Co2,

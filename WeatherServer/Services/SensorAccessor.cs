@@ -43,6 +43,7 @@ namespace WeatherServer.Services
             return new AmbientData
             {
                 SensorId = id,
+                SensorType = SensorType.Outdoor,
                 Temperature = MedianOutsideTemperature + MedianOutsideTemperature * _rand.Next(-10, 10) / 100.0f,
                 Humidity = MedianOutsideHumidity + MedianOutsideHumidity * _rand.Next(-15, 15) / 100.0f,
                 Co2 = MedianOutsideCo2Level + (int)(MedianOutsideCo2Level * _rand.Next(-5, 5) / 100.0f),
@@ -55,6 +56,7 @@ namespace WeatherServer.Services
             return new AmbientData
             {
                 SensorId = id,
+                SensorType = SensorType.Indoor,
                 Temperature = MedianIndoorTemperature + MedianIndoorTemperature * _rand.Next(-5, 5) / 100.0f,
                 Humidity = MedianIndoorHumidity + MedianIndoorHumidity * _rand.Next(-10, 10) / 100.0f,
                 Co2 = MedianIndoorCo2Level + (int)(MedianIndoorCo2Level * _rand.Next(-20, 20) / 100.0),

@@ -7,6 +7,7 @@ using Grpc.Core;
 using WeatherServer.Contracts;
 using WeatherServer.Interfaces;
 using AmbientData = WeatherServer.Contracts.AmbientData;
+using Enum = System.Enum;
 
 namespace WeatherServer.Services
 {
@@ -90,6 +91,7 @@ namespace WeatherServer.Services
             var response = new AmbientData
             {
                 SensorId = data.SensorId,
+                SensorType = Enum.Parse<AmbientData.Types.SensorType>(data.SensorType.ToString()),
                 Temperature = data.Temperature,
                 Humidity = data.Humidity,
                 Co2 = data.Co2,
