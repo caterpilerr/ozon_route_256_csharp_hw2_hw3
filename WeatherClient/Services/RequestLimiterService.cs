@@ -8,6 +8,7 @@ namespace WeatherClient.Services;
 public class RequestLimiterService : IRequestLimiterService
 {
     private readonly ConcurrentDictionary<string, IpRequestsData> _requests = new();
+    private readonly object _lock = new();
 
     public bool IsRequestValid(string clientIp, string path, RateLimiterConfiguration configuration)
     {
@@ -16,18 +17,20 @@ public class RequestLimiterService : IRequestLimiterService
         var result = true;
         if (_requests.TryGetValue(key, out var data))
         {
-            if (data.TimeWindowStart + TimeSpan.FromSeconds(configuration.TimeWindowInSeconds) > currentTime)
+            lock (_lock)
             {
-                data.RequestsCount++;
-            }
-            else
-            {
-                data.TimeWindowStart = currentTime;
-                data.RequestsCount = 1;
-            }
+                if (data.TimeWindowStart + TimeSpan.FromSeconds(configuration.TimeWindowInSeconds) > currentTime)
+                {
+                    data.RequestsCount++;
+                }
+                else
+                {
+                    data.TimeWindowStart = currentTime;
+                    data.RequestsCount = 1;
+                }
 
-            _requests[key] = data;
-            result = data.RequestsCount <= configuration.MaxRequests;
+                result = data.RequestsCount <= configuration.MaxRequests;
+            }
         }
         else
         {
@@ -43,7 +46,7 @@ public class RequestLimiterService : IRequestLimiterService
 
     private static string CreateRequestKey(string ipAddress, string path) => $"{ipAddress}_{path}";
 
-    private struct IpRequestsData
+    private class IpRequestsData
     {
         public int RequestsCount { get; set; }
         public DateTime TimeWindowStart { get; set; }
