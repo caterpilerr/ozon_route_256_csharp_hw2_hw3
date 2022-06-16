@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using WeatherClient.Interfaces;
+using WeatherClient.Middlewares;
 using WeatherClient.Services;
 
 namespace WeatherClient
@@ -25,8 +26,12 @@ namespace WeatherClient
             services.AddSingleton<ISensorSubscriptionStore, SensorSubscriptionStore>();
             services.AddSingleton<IAggregatedAmbientDataStore, AggregatedAmbientDataStore>();
             services.AddSingleton<IAmbientDataStreamService, AmbientDataStreamService>();
+            services.AddSingleton<IRequestLimiterService, RequestLimiterService>();
             services.AddHostedService(x => (AmbientDataStreamService)x.GetService<IAmbientDataStreamService>());
-            services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            services
+                .AddControllers()
+                .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherClient", Version = "v1" });
@@ -42,13 +47,15 @@ namespace WeatherClient
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherClient v1"));
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
+            app.UseMiddleware<RateLimiterMiddleware>();
+            
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }

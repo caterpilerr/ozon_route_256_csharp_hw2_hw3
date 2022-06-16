@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WeatherClient.Attributes;
 using WeatherClient.Entities;
 using WeatherClient.Interfaces;
 
@@ -36,6 +37,7 @@ namespace WeatherClient.Controllers
         }
         
         [HttpGet("all")]
+        [RateLimiter(MaxRequests = 1, TimeWindowInSeconds = 10)]
         public ActionResult<List<AggregatedAmbientData>> GetAllData(int id)
         {
             var result = _dataStore.GetAllData(id);
