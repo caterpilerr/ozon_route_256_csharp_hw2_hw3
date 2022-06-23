@@ -56,10 +56,9 @@ public class RateLimiterMiddleware
             return;
         }
 
-        var path = context.Request.Path;
         var endpoint = context.GetEndpoint();
         var clientIp4 = clientIp.MapToIPv4().ToString();
-        var isValidRequest = ValidateRequest(clientIp4, path, endpoint);
+        var isValidRequest = ValidateRequest(clientIp4, endpoint);
         if (!isValidRequest)
         {
             context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -69,11 +68,12 @@ public class RateLimiterMiddleware
         await _next(context);
     }
 
-    private bool ValidateRequest(string ipAddress, string path, Endpoint endpoint)
+    private bool ValidateRequest(string ipAddress, Endpoint endpoint)
     {
+        var endpointName = endpoint.DisplayName;
         if (_clientLimits.TryGetValue(ipAddress, out var limit))
         {
-            return _limiterService.IsRequestValid(ipAddress, path, limit);
+            return _limiterService.IsRequestValid(ipAddress, endpointName, limit);
         }
 
         var rateLimiterAttribute = endpoint?.Metadata.GetMetadata<RateLimiterAttribute>();
@@ -86,9 +86,9 @@ public class RateLimiterMiddleware
                 TimeWindowInSeconds = rateLimiterAttribute.TimeWindowInSeconds
             };
 
-            return _limiterService.IsRequestValid(ipAddress, path, limitsFromAttribute);
+            return _limiterService.IsRequestValid(ipAddress, endpointName, limitsFromAttribute);
         }
 
-        return _limiterService.IsRequestValid(ipAddress, path, _globalRateLimits);
+        return _limiterService.IsRequestValid(ipAddress, endpointName, _globalRateLimits);
     }
 }

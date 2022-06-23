@@ -10,9 +10,9 @@ public class RequestLimiterService : IRequestLimiterService
     private readonly ConcurrentDictionary<string, IpRequestsData> _requests = new();
     private readonly object _lock = new();
 
-    public bool IsRequestValid(string clientIp, string path, RateLimiterConfiguration configuration)
+    public bool IsRequestValid(string clientIp, string endpoint, RateLimiterConfiguration configuration)
     {
-        var key = CreateRequestKey(clientIp, path);
+        var key = CreateRequestKey(clientIp, endpoint);
         var currentTime = DateTime.Now;
         var result = true;
         if (_requests.TryGetValue(key, out var data))
@@ -44,7 +44,7 @@ public class RequestLimiterService : IRequestLimiterService
         return result;
     }
 
-    private static string CreateRequestKey(string ipAddress, string path) => $"{ipAddress}_{path}";
+    private static string CreateRequestKey(string ipAddress, string endpoint) => $"{ipAddress}_{endpoint}";
 
     private class IpRequestsData
     {

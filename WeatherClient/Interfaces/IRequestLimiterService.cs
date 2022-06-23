@@ -4,5 +4,5 @@ namespace WeatherClient.Interfaces;
 
 public interface IRequestLimiterService
 {
-    public bool IsRequestValid(string clientIp, string path, RateLimiterConfiguration configuration);
+    public bool IsRequestValid(string clientIp, string endpoint, RateLimiterConfiguration configuration);
 }
